@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lazaro Car Mobile — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0e;
+  --surface: #131417;
+  --panel: #1a1b1f;
+  --raised: #202228;
+  --border: #2c2d33;
+  --border-light: #38393f;
+  --accent: #22c55e;
+  --accent-dim: rgba(34,197,94,0.12);
+  --accent-hover: #16a34a;
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.1);
+  --yellow: #f59e0b;
+  --yellow-dim: rgba(245,158,11,0.1);
+  --white: #f0ede8;
+  --muted: #6b7280;
+  --muted-light: #9ca3af;
+  --font-head: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --radius: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── LOGIN ── */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 50%, rgba(34,197,94,0.05) 0%, transparent 60%),
+    var(--bg);
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--shadow);
+}
+
+.login-logo {
+  font-family: var(--font-head);
+  font-size: 1.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-bottom: 0.3rem;
+}
+.login-logo span { color: var(--accent); }
+.login-sub {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2.5rem;
+}
+
+.field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+.field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted-light);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.field input {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.field input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+}
+.field input::placeholder { color: #3a3b42; }
+
+.btn-login {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.9rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 0.5rem;
+}
+.btn-login:hover { background: var(--accent-hover); }
+.btn-login:active { transform: scale(0.99); }
+
+.login-error {
+  color: var(--red);
+  font-size: 0.82rem;
+  text-align: center;
+  margin-top: 0.75rem;
+  min-height: 1.2rem;
+}
+
+/* ── ADMIN SHELL ── */
+#admin-screen { display: none; }
+
+.shell {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 56px 1fr;
+  min-height: 100vh;
+}
+
+/* TOP BAR */
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-logo {
+  font-family: var(--font-head);
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.topbar-logo span { color: var(--accent); }
+.topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+.topbar-badge {
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-head);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+.btn-logout {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-head);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0 1.25rem;
+  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+}
+.sidebar-section:first-child { margin-top: 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1.25rem;
+  color: var(--muted-light);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
+}
+.nav-item:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+.nav-item.active {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-left-color: var(--accent);
+  font-weight: 600;
+}
+.nav-icon { font-size: 1rem; width: 18px; text-align: center; flex-shrink: 0; }
+
+.nav-count {
+  margin-left: auto;
+  background: var(--raised);
+  color: var(--muted-light);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.5rem;
+  border-radius: 20px;
+  font-family: var(--font-head);
+  letter-spacing: 0.05em;
+}
+.nav-count.green { background: var(--accent-dim); color: var(--accent); }
+
+/* MAIN */
+.main {
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.view { display: none; padding: 2rem; }
+.view.active { display: block; }
+
+/* PAGE HEADER */
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.page-title {
+  font-family: var(--font-head);
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.page-title span { color: var(--accent); }
+.page-subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+/* STAT CARDS */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--surface);
+  padding: 1.25rem 1.5rem;
+}
+.stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.stat-value {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.stat-value.green { color: var(--accent); }
+.stat-value.yellow { color: var(--yellow); }
+.stat-value.red { color: var(--red); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-head);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-green { background: var(--accent); color: #000; }
+.btn-green:hover { background: var(--accent-hover); }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--muted-light); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: var(--red-dim); border: 1px solid rgba(239,68,68,0.25); color: var(--red); }
+.btn-danger:hover { background: var(--red); color: white; }
+.btn-sm { padding: 0.35rem 0.75rem; font-size: 0.72rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* SEARCH / FILTER BAR */
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+.search-wrap::before {
+  content: '🔍';
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 0.6rem 1rem 0.6rem 2.25rem;
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--accent); }
+.search-input::placeholder { color: var(--muted); }
+
+.filter-select {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  outline: none;
+  cursor: pointer;
+}
+.filter-select:focus { border-color: var(--accent); }
+.filter-select option { background: var(--surface); }
+
+/* CAR TABLE */
+.car-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.car-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.car-table th {
+  background: var(--panel);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.car-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  font-size: 0.88rem;
+}
+
+.car-table tr:last-child td { border-bottom: none; }
+.car-table tbody tr { transition: background 0.15s; }
+.car-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+.car-thumb-wrap {
+  width: 80px;
+  height: 54px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--raised);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.car-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+
+.car-name-cell strong {
+  display: block;
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 0.2rem;
+}
+.car-name-cell span {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.price-cell {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-head);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.status-pill::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.pill-available { background: var(--accent-dim); color: var(--accent); }
+.pill-sold { background: rgba(107,114,128,0.15); color: var(--muted-light); }
+
+.actions-cell { display: flex; gap: 0.4rem; align-items: center; }
+
+.empty-table {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+}
+.empty-table-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+.empty-table-text {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── MODAL / DRAWER ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  backdrop-filter: blur(4px);
+}
+.overlay.open { display: block; }
+
+.drawer {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 100%;
+  max-width: 560px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -8px 0 40px rgba(0,0,0,0.5);
+}
+.drawer.open { transform: translateX(0); }
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.drawer-title span { color: var(--accent); }
+
+.btn-close {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: color 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+.btn-close:hover { color: var(--white); border-color: var(--border-light); }
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+.drawer-body::-webkit-scrollbar { width: 4px; }
+.drawer-body::-webkit-scrollbar-track { background: transparent; }
+.drawer-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.drawer-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  background: var(--surface);
+}
+
+/* FORM */
+.form-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+  margin-top: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.form-section-label:first-child { margin-top: 0; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.85rem; }
+.form-field.full { grid-column: 1 / -1; }
+.form-field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.form-field label .req { color: var(--accent); margin-left: 2px; }
+
+.form-input, .form-select, .form-textarea {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+}
+.form-input::placeholder, .form-textarea::placeholder { color: #3a3b42; }
+.form-select option { background: var(--panel); }
+.form-textarea { resize: vertical; min-height: 85px; }
+
+/* PHOTO UPLOAD */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+.upload-zone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  transform: scale(1.01);
+}
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.upload-zone-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.upload-zone-text {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+.upload-zone-sub { font-size: 0.75rem; color: var(--muted); }
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.photo-item {
+  position: relative;
+  padding-top: 72%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--raised);
+}
+.photo-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-item-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0,0,0,0.8);
+  border: none;
+  color: white;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.photo-item:hover .photo-item-remove { opacity: 1; }
+.photo-item-badge {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  background: rgba(0,0,0,0.75);
+  color: var(--accent);
+  font-size: 0.55rem;
+  font-family: var(--font-head);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+/* DELETE CONFIRM */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.confirm-modal.open { display: flex; }
+.confirm-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: var(--shadow);
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.confirm-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.confirm-title {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.confirm-text { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.5rem; }
+.confirm-car-name { color: var(--white); font-weight: 600; }
+.confirm-btns { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+/* TOAST */
+.toast-wrap {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: var(--shadow);
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: auto;
+  min-width: 260px;
+  max-width: 360px;
+}
+.toast.show { transform: translateX(0); }
+.toast-icon { font-size: 1.1rem; flex-shrink: 0; }
+.toast-text { flex: 1; }
+.toast.success { border-color: rgba(34,197,94,0.3); }
+.toast.success .toast-icon-bg { background: var(--accent-dim); }
+.toast.error { border-color: rgba(239,68,68,0.3); }
+
+/* SPINNER */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,0,0,0.25);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .shell { grid-template-columns: 1fr; grid-template-rows: 56px auto 1fr; }
+  .sidebar { display: flex; overflow-x: auto; padding: 0; border-right: none; border-bottom: 1px solid var(--border); }
+  .sidebar-section { display: none; }
+  .nav-item { padding: 0 1rem; height: 48px; border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; font-size: 0.8rem; }
+  .nav-item.active { border-bottom-color: var(--accent); border-left: none; }
+  .main { overflow-y: auto; }
+  .view { padding: 1.25rem; }
+  .form-grid { grid-template-columns: 1fr; }
+  .car-table th:nth-child(3), .car-table td:nth-child(3),
+  .car-table th:nth-child(4), .car-table td:nth-child(4) { display: none; }
+  .drawer { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Lazaro <span>Car</span> Mobile</div>
+    <div class="login-sub">Owner Dashboard</div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter') doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()" id="login-btn">Enter Dashboard</button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN ═══════════════════════════════════════════════════ -->
+<div id="admin-screen">
+  <div class="shell">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-logo">Lazaro <span>Car</span> Mobile</div>
+      <div class="topbar-right">
+        <div class="topbar-badge">Admin</div>
+        <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-section">Menu</div>
+      <div class="nav-item active" onclick="goView('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="goView('inventory', this)">
+        <span class="nav-icon">🚗</span> All Cars
+        <span class="nav-count green" id="nav-count-all">0</span>
+      </div>
+      <div class="nav-item" onclick="goView('available', this)">
+        <span class="nav-icon">✅</span> Available
+        <span class="nav-count green" id="nav-count-avail">0</span>
+      </div>
+      <div class="nav-item" onclick="goView('sold', this)">
+        <span class="nav-icon">🔴</span> Sold
+        <span class="nav-count" id="nav-count-sold">0</span>
+      </div>
+      <div class="sidebar-section">Actions</div>
+      <div class="nav-item" onclick="openDrawer(null)">
+        <span class="nav-icon">➕</span> Add New Car
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Dashboard <span>Overview</span></div>
+            <div class="page-subtitle">Manage your entire inventory from here</div>
+          </div>
+          <button class="btn btn-green" onclick="openDrawer(null)">＋ Add New Car</button>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total Listings</div>
+            <div class="stat-value green" id="stat-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Available</div>
+            <div class="stat-value green" id="stat-avail">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Sold</div>
+            <div class="stat-value" id="stat-sold">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Value</div>
+            <div class="stat-value yellow" id="stat-value">$0</div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <div style="font-family:var(--font-head);font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">
+            Recent <span style="color:var(--accent)">Listings</span>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="goView('inventory', document.querySelector('.nav-item:nth-child(2)'))">View All →</button>
+        </div>
+        <div class="car-table-wrap">
+          <table class="car-table">
+            <thead><tr>
+              <th>Photo</th><th>Vehicle</th><th>Price</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="dash-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- INVENTORY VIEW -->
+      <div class="view" id="view-inventory">
+        <div class="page-head">
+          <div>
+            <div class="page-title" id="inv-title">All <span>Cars</span></div>
+            <div class="page-subtitle" id="inv-subtitle"></div>
+          </div>
+          <button class="btn btn-green" onclick="openDrawer(null)">＋ Add New Car</button>
+        </div>
+        <div class="toolbar">
+          <div class="search-wrap">
+            <input class="search-input" id="search-q" placeholder="Search make, model, year…" oninput="renderInventoryView()">
+          </div>
+          <select class="filter-select" id="filter-status" onchange="renderInventoryView()">
+            <option value="">All Status</option>
+            <option value="available">Available</option>
+            <option value="sold">Sold</option>
+          </select>
+          <select class="filter-select" id="filter-type" onchange="renderInventoryView()">
+            <option value="">All Types</option>
+            <option value="sedan">Sedan</option>
+            <option value="suv">SUV</option>
+            <option value="truck">Truck</option>
+            <option value="coupe">Coupe</option>
+            <option value="convertible">Convertible</option>
+            <option value="van">Van</option>
+          </select>
+        </div>
+        <div class="car-table-wrap">
+          <table class="car-table">
+            <thead><tr>
+              <th>Photo</th><th>Vehicle</th><th>Mileage</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="inv-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AVAILABLE VIEW -->
+      <div class="view" id="view-available">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Available <span>Cars</span></div>
+            <div class="page-subtitle">Cars currently listed for sale</div>
+          </div>
+          <button class="btn btn-green" onclick="openDrawer(null)">＋ Add New Car</button>
+        </div>
+        <div class="car-table-wrap">
+          <table class="car-table">
+            <thead><tr>
+              <th>Photo</th><th>Vehicle</th><th>Mileage</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="avail-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SOLD VIEW -->
+      <div class="view" id="view-sold">
+        <div class="page-head">
+          <div>
+            <div class="page-title">Sold <span>Cars</span></div>
+            <div class="page-subtitle">Cars marked as sold</div>
+          </div>
+        </div>
+        <div class="car-table-wrap">
+          <table class="car-table">
+            <thead><tr>
+              <th>Photo</th><th>Vehicle</th><th>Mileage</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="sold-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ DRAWER (Add / Edit) ════════════════════════════════════ -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-title" id="drawer-title">Add <span>New Car</span></div>
+    <button class="btn-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+  <div class="drawer-footer">
+    <button class="btn btn-outline" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-green" onclick="saveCar()" id="save-btn">Publish Listing</button>
+  </div>
+</aside>
+
+<!-- ══ DELETE CONFIRM ════════════════════════════════════════ -->
+<div class="overlay" id="confirm-overlay"></div>
+<div class="confirm-modal" id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Delete Listing?</div>
+    <div class="confirm-text">This will permanently remove <span class="confirm-car-name" id="confirm-car-name"></span> from your inventory. This cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()" id="confirm-delete-btn">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOASTS ═════════════════════════════════════════════════ -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const ADMIN_PASSWORD = 'owner123'; // ← Change this to your password
+const STORAGE_KEY    = 'iw_cars';  // Must match your index.html
+// ─────────────────────────────────────────────────────────────
+
+let cars = [];
+let editingId = null;
+let pendingPhotos = [];   // new File objects
+let keptPhotos   = [];    // existing base64/url strings to keep
+let deleteTargetId = null;
+let currentView = 'dashboard';
+
+// ── AUTH ─────────────────────────────────────────────────────
+function doLogin() {
+  const pass = document.getElementById('login-pass').value;
+  if (pass === ADMIN_PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    loadCars();
+  } else {
+    const err = document.getElementById('login-error');
+    err.textContent = 'Incorrect password. Try again.';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+    setTimeout(() => { err.textContent = ''; }, 3000);
+  }
+}
+
+function doLogout() {
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+}
+
+// ── DATA ──────────────────────────────────────────────────────
+function loadCars() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    cars = raw ? JSON.parse(raw) : [];
+  } catch { cars = []; }
+  refreshAll();
+}
+
+function persistCars() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cars));
+  refreshAll();
+}
+
+function refreshAll() {
+  updateStats();
+  updateNavCounts();
+  renderDashboard();
+  renderInventoryView();
+  renderFiltered('avail-tbody', c => c.status === 'available');
+  renderFiltered('sold-tbody',  c => c.status === 'sold');
+}
+
+// ── STATS ─────────────────────────────────────────────────────
+function updateStats() {
+  const avail = cars.filter(c => c.status === 'available');
+  const sold  = cars.filter(c => c.status === 'sold');
+  const val   = avail.reduce((s, c) => s + (Number(c.price) || 0), 0);
+  set('stat-total', cars.length);
+  set('stat-avail', avail.length);
+  set('stat-sold',  sold.length);
+  set('stat-value', '$' + val.toLocaleString());
+}
+
+function updateNavCounts() {
+  set('nav-count-all',   cars.length);
+  set('nav-count-avail', cars.filter(c => c.status === 'available').length);
+  set('nav-count-sold',  cars.filter(c => c.status === 'sold').length);
+}
+
+function set(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function goView(view, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  currentView = view;
+
+  if (view === 'inventory') {
+    document.getElementById('inv-title').innerHTML = 'All <span style="color:var(--accent)">Cars</span>';
+    document.getElementById('inv-subtitle').textContent = `${cars.length} total listings`;
+    document.getElementById('filter-status').value = '';
+    renderInventoryView();
+  }
+  if (view === 'available') renderFiltered('avail-tbody', c => c.status === 'available');
+  if (view === 'sold')      renderFiltered('sold-tbody',  c => c.status === 'sold');
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function thumbHTML(car) {
+  if (car.photos && car.photos.length > 0 && car.photos[0]) {
+    return `<div class="car-thumb-wrap"><img src="${car.photos[0]}" alt="" onerror="this.parentElement.innerHTML='🚗'"></div>`;
+  }
+  return `<div class="car-thumb-wrap">🚗</div>`;
+}
+
+function statusPill(car) {
+  return car.status === 'sold'
+    ? `<span class="status-pill pill-sold">Sold</span>`
+    : `<span class="status-pill pill-available">Available</span>`;
+}
+
+function rowHTML(car, compact = false) {
+  const mil = compact ? '' : `<td>${(car.mileage || 0).toLocaleString()} mi</td>`;
+  const typ = compact ? '' : `<td style="color:var(--muted-light);font-size:0.82rem;">${cap(car.type || '—')}</td>`;
+  return `
+    <tr>
+      <td>${thumbHTML(car)}</td>
+      <td>
+        <div class="car-name-cell">
+          <strong>${car.year} ${car.make} ${car.model}</strong>
+          <span>${car.color || ''} · ${car.engine || '—'}</span>
+        </div>
+      </td>
+      ${mil}${typ}
+      <td class="price-cell">$${Number(car.price || 0).toLocaleString()}</td>
+      <td>${statusPill(car)}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-outline btn-sm" onclick="openDrawer(${car.id})">✏️ Edit</button>
+          <button class="btn btn-sm" style="background:var(--yellow-dim);border:1px solid rgba(245,158,11,0.25);color:var(--yellow);" onclick="toggleSold(${car.id})">
+            ${car.status === 'sold' ? '↩ Relist' : '✔ Mark Sold'}
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="askDelete(${car.id})">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+function emptyRow(cols, msg) {
+  return `<tr><td colspan="${cols}">
+    <div class="empty-table">
+      <div class="empty-table-icon">🚗</div>
+      <div class="empty-table-text">${msg}</div>
+    </div>
+  </td></tr>`;
+}
+
+function renderDashboard() {
+  const tbody = document.getElementById('dash-tbody');
+  const recent = [...cars].slice(0, 6);
+  tbody.innerHTML = recent.length
+    ? recent.map(c => rowHTML(c, true)).join('')
+    : emptyRow(5, 'No listings yet — add your first car');
+}
+
+function renderInventoryView() {
+  const q      = (document.getElementById('search-q')?.value || '').toLowerCase();
+  const status = document.getElementById('filter-status')?.value || '';
+  const type   = document.getElementById('filter-type')?.value || '';
+
+  const filtered = cars.filter(c => {
+    const matchQ = !q || `${c.make} ${c.model} ${c.year} ${c.color}`.toLowerCase().includes(q);
+    const matchS = !status || c.status === status;
+    const matchT = !type   || c.type   === type;
+    return matchQ && matchS && matchT;
+  });
+
+  document.getElementById('inv-subtitle').textContent = `${filtered.length} of ${cars.length} listings`;
+
+  const tbody = document.getElementById('inv-tbody');
+  tbody.innerHTML = filtered.length
+    ? filtered.map(c => rowHTML(c)).join('')
+    : emptyRow(7, 'No cars match your search');
+}
+
+function renderFiltered(tbodyId, filterFn) {
+  const list  = cars.filter(filterFn);
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  tbody.innerHTML = list.length
+    ? list.map(c => rowHTML(c)).join('')
+    : emptyRow(7, 'Nothing here yet');
+}
+
+// ── DRAWER ────────────────────────────────────────────────────
+function openDrawer(id) {
+  editingId     = id;
+  pendingPhotos = [];
+
+  const car = id ? cars.find(c => c.id === id) : null;
+  keptPhotos = car?.photos ? [...car.photos] : [];
+
+  document.getElementById('drawer-title').innerHTML = car
+    ? `Edit <span>${car.year} ${car.make} ${car.model}</span>`
+    : 'Add <span>New Car</span>';
+  document.getElementById('save-btn').textContent = car ? 'Save Changes' : 'Publish Listing';
+
+  document.getElementById('drawer-body').innerHTML = buildForm(car);
+  renderPhotoGrid();
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Drag-and-drop on upload zone
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    addFiles(e.dataTransfer.files);
+  });
+}
+
+function closeDrawer() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+  document.body.style.overflow = '';
+  editingId = null;
+}
+
+function buildForm(car) {
+  const v = car || {};
+  const typeOpts = ['sedan','suv','truck','coupe','convertible','van'];
+  const transOpts = ['Automatic','Manual','CVT'];
+  return `
+    <div class="form-section-label">Vehicle Info</div>
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Make <span class="req">*</span></label>
+        <input class="form-input" id="f-make" value="${esc(v.make)}" placeholder="e.g. Nissan">
+      </div>
+      <div class="form-field">
+        <label>Model <span class="req">*</span></label>
+        <input class="form-input" id="f-model" value="${esc(v.model)}" placeholder="e.g. Altima">
+      </div>
+      <div class="form-field">
+        <label>Year <span class="req">*</span></label>
+        <input class="form-input" id="f-year" type="number" value="${v.year||''}" placeholder="2019" min="1950" max="2030">
+      </div>
+      <div class="form-field">
+        <label>Type</label>
+        <select class="form-select" id="f-type">
+          ${typeOpts.map(t => `<option value="${t}" ${v.type===t?'selected':''}>${cap(t)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-label">Specs</div>
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Mileage</label>
+        <input class="form-input" id="f-mileage" type="number" value="${v.mileage||''}" placeholder="e.g. 40000">
+      </div>
+      <div class="form-field">
+        <label>Color</label>
+        <input class="form-input" id="f-color" value="${esc(v.color)}" placeholder="e.g. White">
+      </div>
+      <div class="form-field">
+        <label>Engine</label>
+        <input class="form-input" id="f-engine" value="${esc(v.engine)}" placeholder="e.g. 2.5L I4">
+      </div>
+      <div class="form-field">
+        <label>Transmission</label>
+        <select class="form-select" id="f-trans">
+          ${transOpts.map(t => `<option value="${t}" ${v.transmission===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-field full">
+      <label>Description</label>
+      <textarea class="form-textarea" id="f-desc" placeholder="Condition, features, history…">${esc(v.description)}</textarea>
+    </div>
+
+    <div class="form-section-label">Pricing & Status</div>
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Asking Price ($) <span class="req">*</span></label>
+        <input class="form-input" id="f-price" type="number" value="${v.price||''}" placeholder="e.g. 12000">
+      </div>
+      <div class="form-field">
+        <label>Status</label>
+        <select class="form-select" id="f-status">
+          <option value="available" ${v.status!=='sold'?'selected':''}>Available</option>
+          <option value="sold"      ${v.status==='sold'?'selected':''}>Sold</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-section-label">Photos</div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" accept="image/*" multiple onchange="addFiles(this.files)">
+      <div class="upload-zone-icon">📷</div>
+      <div class="upload-zone-text">Click or drag photos here</div>
+      <div class="upload-zone-sub">JPG · PNG · WEBP · up to 10 photos</div>
+    </div>
+    <div id="photo-grid" class="photo-grid"></div>`;
+}
+
+// ── PHOTOS ────────────────────────────────────────────────────
+function addFiles(files) {
+  Array.from(files).forEach(f => {
+    if (keptPhotos.length + pendingPhotos.length >= 10) return;
+    pendingPhotos.push(f);
+  });
+  renderPhotoGrid();
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photo-grid');
+  if (!grid) return;
+  let html = '';
+
+  keptPhotos.forEach((src, i) => {
+    const badge = i === 0 ? '<div class="photo-item-badge">Cover</div>' : '';
+    html += `<div class="photo-item">
+      <img src="${src}" alt="">
+      <button class="photo-item-remove" onclick="removeKept(${i})">✕</button>
+      ${badge}
+    </div>`;
+  });
+
+  pendingPhotos.forEach((f, i) => {
+    const url = URL.createObjectURL(f);
+    const isFirst = keptPhotos.length === 0 && i === 0;
+    const badge = isFirst ? '<div class="photo-item-badge">Cover</div>' : '';
+    html += `<div class="photo-item">
+      <img src="${url}" alt="">
+      <button class="photo-item-remove" onclick="removePending(${i})">✕</button>
+      ${badge}
+    </div>`;
+  });
+
+  grid.innerHTML = html;
+}
+
+function removeKept(i)    { keptPhotos.splice(i, 1);    renderPhotoGrid(); }
+function removePending(i) { pendingPhotos.splice(i, 1); renderPhotoGrid(); }
+
+// Convert pending File objects to base64 strings
+async function resolvePhotos() {
+  const base64s = await Promise.all(pendingPhotos.map(f => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result);
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(f);
+  })));
+  return [...keptPhotos, ...base64s];
+}
+
+// ── SAVE ──────────────────────────────────────────────────────
+async function saveCar() {
+  const make  = val('f-make').trim();
+  const model = val('f-model').trim();
+  const year  = val('f-year');
+  const price = val('f-price');
+
+  if (!make || !model || !year || !price) {
+    toast('Please fill in all required fields (*)', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const photos = await resolvePhotos();
+
+  const payload = {
+    make, model,
+    year:         parseInt(year),
+    type:         val('f-type'),
+    mileage:      parseInt(val('f-mileage')) || 0,
+    color:        val('f-color')   || '—',
+    engine:       val('f-engine')  || '—',
+    transmission: val('f-trans'),
+    description:  val('f-desc'),
+    price:        parseFloat(price),
+    status:       val('f-status'),
+    photos,
+  };
+
+  if (editingId) {
+    const idx = cars.findIndex(c => c.id === editingId);
+    if (idx > -1) cars[idx] = { ...cars[idx], ...payload };
+    toast(`✅ ${payload.year} ${payload.make} ${payload.model} updated`);
+  } else {
+    payload.id = Date.now();
+    cars.unshift(payload);
+    toast(`✅ ${payload.year} ${payload.make} ${payload.model} published`);
+  }
+
+  persistCars();
+  closeDrawer();
+  btn.innerHTML = 'Save Changes';
+  btn.disabled = false;
+}
+
+// ── QUICK ACTIONS ─────────────────────────────────────────────
+function toggleSold(id) {
+  const car = cars.find(c => c.id === id);
+  if (!car) return;
+  car.status = car.status === 'sold' ? 'available' : 'sold';
+  persistCars();
+  toast(`${car.year} ${car.make} ${car.model} marked as ${car.status}`);
+}
+
+// ── DELETE ────────────────────────────────────────────────────
+function askDelete(id) {
+  const car = cars.find(c => c.id === id);
+  if (!car) return;
+  deleteTargetId = id;
+  document.getElementById('confirm-car-name').textContent = `${car.year} ${car.make} ${car.model}`;
+  document.getElementById('confirm-overlay').classList.add('open');
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+function closeConfirm() {
+  deleteTargetId = null;
+  document.getElementById('confirm-overlay').classList.remove('open');
+  document.getElementById('confirm-modal').classList.remove('open');
+}
+
+function confirmDelete() {
+  if (!deleteTargetId) return;
+  const car = cars.find(c => c.id === deleteTargetId);
+  cars = cars.filter(c => c.id !== deleteTargetId);
+  persistCars();
+  closeConfirm();
+  toast(`🗑️ ${car ? car.year + ' ' + car.make + ' ' + car.model : 'Listing'} removed`);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span class="toast-icon">${type === 'error' ? '⚠️' : '✅'}</span><span class="toast-text">${msg}</span>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 400);
+  }, 3500);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function val(id)  { return (document.getElementById(id)?.value || ''); }
+function esc(s)   { return (s || '').toString().replace(/"/g, '&quot;'); }
+function cap(s)   { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+</script>
+</body>
+</html>
