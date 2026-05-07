@@ -1085,8 +1085,8 @@ function saveCars() { localStorage.setItem('iw_cars', JSON.stringify(cars)); }
 // ── NAVIGATION ───────────────────────────────────────────────
 function showPage(page) {
   if (page === 'sell') {
-    const password = prompt('Enter owner password to add cars:');
-    if (password !== 'owner123') { // Change this to your desired password
+    const password = prompt('Enter password to add cars:');
+    if (password !== 'Varadero') { // Change this to your desired password
       alert('Access denied.');
       return;
     }
