@@ -1030,7 +1030,6 @@ body {
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
 const ADMIN_PASSWORD = 'Varadero2020'; // ← Change this to your password
-const STORAGE_KEY    = 'iw_cars';  // Must match your index.html
 // ─────────────────────────────────────────────────────────────
 
 let cars = [];
@@ -1063,16 +1062,19 @@ function doLogout() {
 }
 
 // ── DATA ──────────────────────────────────────────────────────
-function loadCars() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    cars = raw ? JSON.parse(raw) : [];
-  } catch { cars = []; }
-  refreshAll();
-}
+async function loadCars() {
+  const { data, error } = await window.supabaseClient
+    .from('cars')
+    .select('*')
+    .order('id', { ascending: false });
 
-function persistCars() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cars));
+  if (error) {
+    console.error(error);
+    toast('Failed to load cars', 'error');
+    return;
+  }
+
+  cars = data || [];
   refreshAll();
 }
 
@@ -1411,30 +1413,80 @@ async function saveCar() {
     photos,
   };
 
-  if (editingId) {
-    const idx = cars.findIndex(c => c.id === editingId);
-    if (idx > -1) cars[idx] = { ...cars[idx], ...payload };
-    toast(`✅ ${payload.year} ${payload.make} ${payload.model} updated`);
-  } else {
-    payload.id = Date.now();
-    cars.unshift(payload);
-    toast(`✅ ${payload.year} ${payload.make} ${payload.model} published`);
-  }
+  try {
 
-  persistCars();
-  closeDrawer();
-  btn.innerHTML = 'Save Changes';
-  btn.disabled = false;
+    if (editingId) {
+
+        const { error } = await window.supabaseClient
+            .from('cars')
+            .update(payload)
+            .eq('id', editingId);
+
+        if (error) throw error;
+
+        toast(`✅ ${payload.year} ${payload.make} ${payload.model} updated`);
+
+    } else {
+
+        const { error } = await window.supabaseClient
+            .from('cars')
+            .insert([payload]);
+
+        if (error) throw error;
+
+        toast(`✅ ${payload.year} ${payload.make} ${payload.model} published`);
+    }
+
+    await loadCars();
+
+    closeDrawer();
+
+}
+catch(err){
+
+    console.error(err);
+
+    toast(err.message,'error');
+
+}
+finally{
+
+    btn.innerHTML = 'Save Changes';
+
+    btn.disabled = false;
+
+}
 }
 
 // ── QUICK ACTIONS ─────────────────────────────────────────────
-function toggleSold(id) {
-  const car = cars.find(c => c.id === id);
-  if (!car) return;
-  car.status = car.status === 'sold' ? 'available' : 'sold';
-  persistCars();
-  toast(`${car.year} ${car.make} ${car.model} marked as ${car.status}`);
+async function toggleSold(id) {
+
+    const car = cars.find(c => c.id === id);
+    if (!car) return;
+
+    const newStatus =
+        car.status === 'sold'
+            ? 'available'
+            : 'sold';
+
+    const { error } = await window.supabaseClient
+        .from('cars')
+        .update({
+            status: newStatus
+        })
+        .eq('id', id);
+
+    if (error) {
+        console.error(error);
+        toast(error.message, 'error');
+        return;
+    }
+
+    await loadCars();
+
+    toast(`${car.year} ${car.make} ${car.model} marked as ${newStatus}`);
 }
+
 
 // ── DELETE ────────────────────────────────────────────────────
 function askDelete(id) {
@@ -1452,14 +1504,30 @@ function closeConfirm() {
   document.getElementById('confirm-modal').classList.remove('open');
 }
 
-function confirmDelete() {
-  if (!deleteTargetId) return;
-  const car = cars.find(c => c.id === deleteTargetId);
-  cars = cars.filter(c => c.id !== deleteTargetId);
-  persistCars();
-  closeConfirm();
-  toast(`🗑️ ${car ? car.year + ' ' + car.make + ' ' + car.model : 'Listing'} removed`);
+async function confirmDelete() {
+
+    if (!deleteTargetId) return;
+
+    const car = cars.find(c => c.id === deleteTargetId);
+
+    const { error } = await window.supabaseClient
+        .from('cars')
+        .delete()
+        .eq('id', deleteTargetId);
+
+    if (error) {
+        console.error(error);
+        toast(error.message, 'error');
+        return;
+    }
+
+    closeConfirm();
+
+    await loadCars();
+
+    toast(`🗑 ${car ? `${car.year} ${car.make} ${car.model}` : 'Listing'} removed`);
 }
+
 
 // ── TOAST ─────────────────────────────────────────────────────
 function toast(msg, type = 'success') {
@@ -1480,5 +1548,8 @@ function val(id)  { return (document.getElementById(id)?.value || ''); }
 function esc(s)   { return (s || '').toString().replace(/"/g, '&quot;'); }
 function cap(s)   { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/database.js"></script>
+<script src="js/admin.js"></script>
 </body>
 </html>

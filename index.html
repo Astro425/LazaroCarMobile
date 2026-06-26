@@ -1152,7 +1152,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/database.js"></script>
 <script>
 // ── DATA STORE ──────────────────────────────────────────────
 
@@ -1174,13 +1175,29 @@ const DEFAULT_CARS = [
   }
 ];
 
-const storedCars = localStorage.getItem('iw_cars');
-let cars = storedCars ? JSON.parse(storedCars) : DEFAULT_CARS;
+let cars = [];
 let uploadedPhotos = [];
 let currentLanguage = 'en';
 let currentCarId = null;
 
-function saveCars() { localStorage.setItem('iw_cars', JSON.stringify(cars)); }
+async function loadCars() {
+
+    const { data, error } = await window.supabaseClient
+        .from('cars')
+        .select('*')
+        .order('featured', { ascending: false })
+        .order('id', { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    cars = data || [];
+
+    renderFeatured();
+    renderInventory(cars);
+}
 
 // ── NAVIGATION ───────────────────────────────────────────────
 function showPage(page) {
@@ -1571,7 +1588,7 @@ function showToast(msg, color = 'var(--green)') {
 }
 
 // ── INIT ─────────────────────────────────────────────────────
-renderFeatured();
+loadCars();
 showLanguagePrompt();
 </script>
 </body>
