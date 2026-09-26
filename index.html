@@ -99,7 +99,7 @@
   /* HERO */
   .hero {
     margin-top: 64px;
-    height: calc(100vh - 64px);
+    height: 520px;
     min-height: 500px;
     position: relative;
     display: flex;
@@ -927,7 +927,7 @@
 
 <!-- NAV -->
 <nav>
-  <div class="logo">Lazaro <span>Car</span> Mobil</div>
+  <div class="logo">Lazaro <span>Car</span> Sales</div>
   <div class="nav-links">
     <button onclick="showPage('home')" id="nav-home" class="active">Home</button>
     <button onclick="showPage('inventory')" id="nav-inventory">Inventory</button>
@@ -944,7 +944,6 @@
     
 
     <div class="hero-content">
-      <div class="hero-tag"> · Miami, FL</div>
       <h1>Find your<br><em>next</em><br>machine.</h1>
       <p>Quality pre-owned vehicles, fully inspected by our certified mechanics. From daily drivers to weekend warriors.</p>
       <div class="hero-btns">
@@ -1540,7 +1539,8 @@ function applyLanguage(lang) {
   document.getElementById('nav-home').textContent = text.navHome;
   document.getElementById('nav-inventory').textContent = text.navInventory;
   // Removed nav-sell
-  document.querySelector('.hero-tag').textContent = text.heroTag;
+  const heroTag = document.querySelector('.hero-tag');
+if (heroTag) heroTag.textContent = text.heroTag;
   document.querySelector('.hero h1').innerHTML = text.heroHeading;
   document.querySelector('.hero p').textContent = text.heroDesc;
   document.querySelector('.hero-btns .btn-primary').textContent = text.browseBtn;
