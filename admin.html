@@ -824,10 +824,16 @@ body {
     <div class="login-logo">Lazaro <span>Car</span> Mobile</div>
     <div class="login-sub">Owner Dashboard</div>
     <div class="field">
-      <label>Password</label>
-      <input type="password" id="login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter') doLogin()">
-    </div>
-    <button class="btn-login" onclick="doLogin()" id="login-btn">Enter Dashboard</button>
+  <label>Email</label>
+  <input type="email" id="login-email" placeholder="Enter your email" onkeydown="if(event.key==='Enter') doLogin()">
+</div>
+
+<div class="field">
+  <label>Password</label>
+  <input type="password" id="login-pass" placeholder="Enter your password" onkeydown="if(event.key==='Enter') doLogin()">
+</div>
+
+<button class="btn-login" onclick="doLogin()" id="login-btn">Enter Dashboard</button>
     <div class="login-error" id="login-error"></div>
   </div>
 </div>
@@ -1029,7 +1035,6 @@ body {
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────
-const ADMIN_PASSWORD = 'Varadero2020'; // ← Change this to your password
 // ─────────────────────────────────────────────────────────────
 
 let cars = [];
@@ -1040,25 +1045,61 @@ let deleteTargetId = null;
 let currentView = 'dashboard';
 
 // ── AUTH ─────────────────────────────────────────────────────
-function doLogin() {
-  const pass = document.getElementById('login-pass').value;
-  if (pass === ADMIN_PASSWORD) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'block';
-    loadCars();
-  } else {
-    const err = document.getElementById('login-error');
-    err.textContent = 'Incorrect password. Try again.';
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+
+  if (!email || !password) {
+    err.textContent = 'Please enter your email and password.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Signing In...';
+  err.textContent = '';
+
+  const { error } = await window.supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    console.error(error);
+    err.textContent = 'Incorrect email or password.';
     document.getElementById('login-pass').value = '';
     document.getElementById('login-pass').focus();
-    setTimeout(() => { err.textContent = ''; }, 3000);
+    btn.disabled = false;
+    btn.textContent = 'Enter Dashboard';
+    return;
   }
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+
+  btn.disabled = false;
+  btn.textContent = 'Enter Dashboard';
+
+  await loadCars();
 }
 
-function doLogout() {
+async function doLogout() {
+  await window.supabaseClient.auth.signOut();
+
   document.getElementById('admin-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-email').value = '';
   document.getElementById('login-pass').value = '';
+}
+async function checkAuth() {
+  const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+  if (session) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
+    await loadCars();
+  }
 }
 
 // ── DATA ──────────────────────────────────────────────────────
@@ -1550,6 +1591,11 @@ function cap(s)   { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/database.js"></script>
+
+<script>
+  checkAuth();
+</script>
+
 <script src="js/admin.js"></script>
 </body>
 </html>
